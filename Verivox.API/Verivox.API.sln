@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Verivox.API", "Verivox.API\Verivox.API.csproj", "{D204AC51-14A3-4365-A109-03CC4601832C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Verivox.API.IntegrationTests", "Verivox.API.IntegrationTests\Verivox.API.IntegrationTests.csproj", "{5FC82956-BE56-48CB-A486-2B0F5CC1A244}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D204AC51-14A3-4365-A109-03CC4601832C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D204AC51-14A3-4365-A109-03CC4601832C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D204AC51-14A3-4365-A109-03CC4601832C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D204AC51-14A3-4365-A109-03CC4601832C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FC82956-BE56-48CB-A486-2B0F5CC1A244}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FC82956-BE56-48CB-A486-2B0F5CC1A244}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FC82956-BE56-48CB-A486-2B0F5CC1A244}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FC82956-BE56-48CB-A486-2B0F5CC1A244}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {092E7901-C3F6-4309-B4B4-0663BD7E5EF5}
+	EndGlobalSection
+EndGlobal
