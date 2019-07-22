@@ -1,78 +1,80 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Verivox.API.Middleware
 {
     /// <summary>
-    /// Exception middleware for unhandled exceptions
+    /// Exception middleware for unhandled exceptions.
     /// </summary>
     public class ExceptionMiddleware
     {
+        private const string BadRequestMessage = "Bad request, please check your input data.";
+        private const string InternalErrorMessage = "Error on server side, please try again later or contact customers support center.";
         private readonly RequestDelegate next;
         private readonly ILogger<ExceptionMiddleware> logger;
 
         /// <summary>
-        /// Ctor
+        /// Initializes a new instance of the <see cref="ExceptionMiddleware"/> class.
         /// </summary>
-        /// <param name="next">Next action in pipeline</param>
-        /// <param name="loggerFactory">Logger for diagnostic</param>
+        /// <param name="next">Next action in pipeline.</param>
+        /// <param name="loggerFactory">Logger for diagnostic.</param>
         public ExceptionMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
-            logger = loggerFactory.CreateLogger<ExceptionMiddleware>();
+            this.logger = loggerFactory.CreateLogger<ExceptionMiddleware>();
             this.next = next;
         }
 
         /// <summary>
-        /// Invoke method in pipeline
+        /// Invoke method in pipeline.
         /// </summary>
-        /// <param name="httpContext">Current context</param>
-        /// <returns>Void</returns>
+        /// <param name="httpContext">Current context.</param>
+        /// <returns>Void.</returns>
         public async Task InvokeAsync(HttpContext httpContext)
         {
             try
             {
-                await next(httpContext);
+                await this.next(httpContext).ConfigureAwait(false);
             }
             catch (InvalidEnumArgumentException exception)
             {
-                logger.LogError(16, exception, exception.Message);
-                await HandleArgumentExceptionAsync(httpContext, exception);
+                this.logger.LogError(16, exception, exception.Message);
+                await HandleArgumentExceptionAsync(httpContext).ConfigureAwait(false);
             }
             catch (ArgumentOutOfRangeException exception)
             {
-                logger.LogError(15, exception, exception.Message);
-                await HandleArgumentExceptionAsync(httpContext, exception);
+                this.logger.LogError(15, exception, exception.Message);
+                await HandleArgumentExceptionAsync(httpContext).ConfigureAwait(false);
             }
             catch (ArgumentException exception)
             {
-                logger.LogError(14, exception, exception.Message);
-                await HandleArgumentExceptionAsync(httpContext, exception);
+                this.logger.LogError(14, exception, exception.Message);
+                await HandleArgumentExceptionAsync(httpContext).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                logger.LogError(13, exception, exception.Message);
-                await HandleExceptionAsync(httpContext, exception);
+                this.logger.LogError(13, exception, exception.Message);
+                await HandleExceptionAsync(httpContext).ConfigureAwait(false);
             }
         }
 
-        private static Task HandleArgumentExceptionAsync(HttpContext context, Exception exception)
+        private static Task HandleArgumentExceptionAsync(HttpContext context)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-            return context.Response.WriteAsync("Bad request, please check your input data.");
+            return context.Response.WriteAsync(BadRequestMessage);
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static Task HandleExceptionAsync(HttpContext context)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            return context.Response.WriteAsync("Error on server side, please try again later or contact customers support center.");
+            return context.Response.WriteAsync(InternalErrorMessage);
         }
     }
 }

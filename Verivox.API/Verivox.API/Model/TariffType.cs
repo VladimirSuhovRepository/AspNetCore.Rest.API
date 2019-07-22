@@ -1,7 +1,7 @@
 ﻿namespace Verivox.API.Model
 {
     /// <summary>
-    /// The list of available tariffs
+    /// The list of available tariffs.
     /// </summary>
     public enum TariffType
     {
@@ -9,9 +9,10 @@
         /// Base tariff
         /// </summary>
         Base,
+
         /// <summary>
         /// Packaged tariff
         /// </summary>
-        Packaged
+        Packaged,
     }
 }

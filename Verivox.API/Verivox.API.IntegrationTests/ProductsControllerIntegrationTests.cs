@@ -1,6 +1,8 @@
+using System;
+using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Verivox.API.Model;
 using Xunit;
@@ -24,15 +26,15 @@ namespace Verivox.API.IntegrationTests
         [InlineData(6000, 1380, BaseTariffName)]
         public async Task ProductsControllerGetBaseProductWithDifferentConsumptionShouldReturnCorrectProduct(long consumption, 
             long expectedAnnualCosts,
-            string tariffName)
+            string expectedTariffName)
         {
             var client = factory.CreateClient();
-            var response = await client.GetAsync($"api/products/product/{TariffType.Base}/{consumption}");
+            var response = await client.GetAsync(new Uri(client.BaseAddress, $"api/products/product/{TariffType.Base}/{consumption}")).ConfigureAwait(false);
 
-            var product = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var product = JObject.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 
-            Assert.Equal(expectedAnnualCosts, product["annualCosts"].Value<long>());
-            Assert.Equal(tariffName, product["tariffName"].Value<string>());
+            product["annualCosts"].Value<long>().Should().Be(expectedAnnualCosts);
+            product["tariffName"].Value<string>().Should().Be(expectedTariffName);
         }
 
         [Theory]
@@ -41,15 +43,15 @@ namespace Verivox.API.IntegrationTests
         [InlineData(6000, 1400, PackagedTariffName)]
         public async Task ProductsControllerGetPackagedProductWithDifferentConsumptionShouldReturnCorrectProduct(long consumption,
             long expectedAnnualCosts,
-            string tariffName)
+            string expectedTariffName)
         {
             var client = factory.CreateClient();
-            var response = await client.GetAsync($"api/products/product/{TariffType.Packaged}/{consumption}");
+            var response = await client.GetAsync(new Uri(client.BaseAddress, $"api/products/product/{TariffType.Packaged}/{consumption}")).ConfigureAwait(false);
 
-            var product = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var product = JObject.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 
-            Assert.Equal(expectedAnnualCosts, product["annualCosts"].Value<long>());
-            Assert.Equal(tariffName, product["tariffName"].Value<string>());
+            product["annualCosts"].Value<long>().Should().Be(expectedAnnualCosts);
+            product["tariffName"].Value<string>().Should().Be(expectedTariffName);
         }
 
         [Theory]
@@ -63,14 +65,35 @@ namespace Verivox.API.IntegrationTests
             string expectedTariffNameSecond)
         {
             var client = factory.CreateClient();
-            var response = await client.GetAsync($"api/products/{consumption}");
+            var response = await client.GetAsync(new Uri(client.BaseAddress, $"api/products/{consumption}")).ConfigureAwait(false);
 
-            var products = JArray.Parse(await response.Content.ReadAsStringAsync());
+            var products = JArray.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 
-            Assert.Equal(expectedAnnualCostsFirst, products[0]["annualCosts"].Value<long>());
-            Assert.Equal(expectedAnnualCostsSecond, products[1]["annualCosts"].Value<long>());
-            Assert.Equal(expectedTariffNameFirst, products[0]["tariffName"].Value<string>());
-            Assert.Equal(expectedTariffNameSecond, products[1]["tariffName"].Value<string>());
+            products[0]["annualCosts"].Value<long>().Should().Be(expectedAnnualCostsFirst);
+            products[1]["annualCosts"].Value<long>().Should().Be(expectedAnnualCostsSecond);
+            products[0]["tariffName"].Value<string>().Should().Be(expectedTariffNameFirst);
+            products[1]["tariffName"].Value<string>().Should().Be(expectedTariffNameSecond);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public async Task ProductsControllerGetAllProductWithIncorrectConsumptionShouldReturnBadRequest(long consumption)
+        {
+            var client = factory.CreateClient();
+            var response = await client.GetAsync(new Uri(client.BaseAddress, $"api/products/{consumption}")).ConfigureAwait(false);
+
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Theory]
+        [InlineData("test")]
+        public async Task ProductsControllerGetAllProductWithStringConsumptionShouldReturnBadRequest(string consumption)
+        {
+            var client = factory.CreateClient();
+            var response = await client.GetAsync(new Uri(client.BaseAddress, $"api/products/{consumption}")).ConfigureAwait(false);
+
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
     }
 }

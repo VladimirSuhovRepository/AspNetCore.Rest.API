@@ -3,30 +3,30 @@
 namespace Verivox.API.Model
 {
     /// <summary>
-    /// The result product according to tariff
+    /// The result product according to tariff.
     /// </summary>
     public class Product
     {
         /// <summary>
-        /// Ctor
+        /// Initializes a new instance of the <see cref="Product"/> class.
         /// </summary>
-        /// <param name="tariffName">Name of tariff</param>
-        /// <param name="annualCosts">Consumption Costs per year in euro</param>
+        /// <param name="tariffName">Name of tariff.</param>
+        /// <param name="annualCosts">Consumption Costs per year in euro (€/year).</param>
         public Product(string tariffName, double annualCosts)
         {
             if (annualCosts <= 0) throw new ArgumentOutOfRangeException(nameof(annualCosts));
 
-            TariffName = tariffName ?? throw new ArgumentNullException(nameof(tariffName));
-            AnnualCosts = annualCosts;
+            this.TariffName = tariffName ?? throw new ArgumentNullException(nameof(tariffName));
+            this.AnnualCosts = annualCosts;
         }
 
         /// <summary>
-        /// Name of tariff
+        /// Gets Name of tariff.
         /// </summary>
         public string TariffName { get; }
 
         /// <summary>
-        /// Consumption Costs per year in euro
+        /// Gets Consumption Costs per year in euro (€/year).
         /// </summary>
         public double AnnualCosts { get; }
     }

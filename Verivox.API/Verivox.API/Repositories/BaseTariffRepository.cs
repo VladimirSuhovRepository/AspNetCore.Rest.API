@@ -21,7 +21,7 @@ namespace Verivox.API.Repositories
 
         public Task<BaseTariff> GetActualTariff()
         {
-            return productsDbContext.BaseTariffs.FirstOrDefaultAsync();
+            return this.productsDbContext.BaseTariffs.FirstOrDefaultAsync();
         }
     }
 }

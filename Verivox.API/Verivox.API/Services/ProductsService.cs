@@ -8,23 +8,23 @@ using Verivox.API.UOW;
 namespace Verivox.API.Services
 {
     /// <summary>
-    /// Service to calculate the product details
+    /// Service to calculate the product details.
     /// </summary>
     public interface IProductsService
     {
         /// <summary>
-        /// Calculates exact product for defined tariff and consumed parameter
+        /// Calculates exact product for defined tariff and consumed parameter.
         /// </summary>
-        /// <param name="tariffType">The type of Tariff: (Base, Packaged)</param>
-        /// <param name="consumption">Consumed amount of kWh</param>
-        /// <returns>Product details for defined tariff and consumed parameter</returns>
+        /// <param name="tariffType">The type of Tariff: (Base, Packaged).</param>
+        /// <param name="consumption">Consumed amount of kWh per year (kWh/year).</param>
+        /// <returns>Product details for defined tariff and consumed parameter.</returns>
         Task<Product> GetProduct(TariffType tariffType, long consumption);
 
         /// <summary>
-        /// Calculates products for all tariffs according to consumed parameter
+        /// Calculates products for all tariffs according to consumed parameter.
         /// </summary>
-        /// <param name="consumption">Consumed amount of kWh</param>
-        /// <returns>List of products sorted by Annual Cost in ascending order</returns>
+        /// <param name="consumption">Consumed amount of kWh per year (kWh/year).</param>
+        /// <returns>List of products sorted by Annual Cost in ascending order.</returns>
         Task<IEnumerable<Product>> GetAllProducts(long consumption);
     }
 
@@ -42,9 +42,9 @@ namespace Verivox.API.Services
             switch (tariffType)
             {
                 case TariffType.Base:
-                    return await GetBaseProduct(consumption);
+                    return await this.GetBaseProduct(consumption).ConfigureAwait(false);
                 case TariffType.Packaged:
-                    return await GetPackagedProduct(consumption);
+                    return await this.GetPackagedProduct(consumption).ConfigureAwait(false);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(tariffType), tariffType, null);
             }
@@ -57,10 +57,10 @@ namespace Verivox.API.Services
 
             foreach (TariffType tariff in Enum.GetValues(typeof(TariffType)))
             {
-                tasks.Add(GetProduct(tariff, consumption));
+                tasks.Add(this.GetProduct(tariff, consumption));
             }
 
-            var products = await Task.WhenAll(tasks);
+            var products = await Task.WhenAll(tasks).ConfigureAwait(false);
             products = products.OrderBy(s => s.AnnualCosts).ToArray();
             result.AddRange(products);
 
@@ -69,23 +69,24 @@ namespace Verivox.API.Services
 
         private async Task<Product> GetBaseProduct(long consumption)
         {
-            var baseTariff = await unitOfWork.BaseTariffRepository.GetActualTariff();
-            var annualCosts = baseTariff.BaseCost * 12 + baseTariff.ConsumptionCost * consumption;
+            var baseTariff = await this.unitOfWork.BaseTariffRepository.GetActualTariff().ConfigureAwait(false);
+            var annualCosts = (baseTariff.BaseCost * 12) + (baseTariff.ConsumptionCost * consumption);
+
             return new Product(baseTariff.Name, annualCosts);
         }
 
         private async Task<Product> GetPackagedProduct(long consumption)
         {
-            var packagedTariff = await unitOfWork.PackagedTariffRepository.GetActualTariff();
+            var packagedTariff = await this.unitOfWork.PackagedTariffRepository.GetActualTariff().ConfigureAwait(false);
 
             if (consumption <= packagedTariff.IncludedConsumptionLevel)
             {
                 return new Product(packagedTariff.Name, packagedTariff.PackageCost);
             }
 
-            var annualCosts = packagedTariff.PackageCost + packagedTariff.ConsumptionCost * (consumption - packagedTariff.IncludedConsumptionLevel);
-            return new Product(packagedTariff.Name, annualCosts);
+            var annualCosts = packagedTariff.PackageCost + (packagedTariff.ConsumptionCost * (consumption - packagedTariff.IncludedConsumptionLevel));
 
+            return new Product(packagedTariff.Name, annualCosts);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Verivox.API.Database;
 using Verivox.API.DTO;
 
@@ -21,7 +21,7 @@ namespace Verivox.API.Repositories
 
         public Task<PackagedTariff> GetActualTariff()
         {
-            return productsDbContext.PackagedTariffs.FirstOrDefaultAsync();
+            return this.productsDbContext.PackagedTariffs.FirstOrDefaultAsync();
         }
     }
 }

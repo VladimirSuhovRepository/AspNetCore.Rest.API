@@ -9,13 +9,14 @@ namespace Verivox.API.UOW
         private readonly ProductsDbContext productsDbContext;
         private bool disposed;
 
-        public ProductsDbUnitOfWork(ProductsDbContext productsDbContext,
+        public ProductsDbUnitOfWork(
+            ProductsDbContext productsDbContext,
             IPackagedTariffRepository packagedTariffRepository,
-            IBaseTariffRepository baseTariffRepository1)
+            IBaseTariffRepository baseTariffRepository)
         {
             this.productsDbContext = productsDbContext;
-            PackagedTariffRepository = packagedTariffRepository;
-            BaseTariffRepository = baseTariffRepository1;
+            this.PackagedTariffRepository = packagedTariffRepository;
+            this.BaseTariffRepository = baseTariffRepository;
         }
 
         public IPackagedTariffRepository PackagedTariffRepository { get; }
@@ -24,25 +25,26 @@ namespace Verivox.API.UOW
 
         public void Commit()
         {
-            productsDbContext.SaveChanges();
-        }
-        
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    productsDbContext.Dispose();
-                }
-                disposed = true;
-            }
+            this.productsDbContext.SaveChanges();
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    this.productsDbContext.Dispose();
+                }
+
+                this.disposed = true;
+            }
         }
     }
 }

@@ -7,9 +7,13 @@ namespace Verivox.API.DTO
     {
         [Key]
         public int BaseTariffId { get; set; }
+
         public TariffType TariffType { get; set; }
+
         public string Name { get; set; }
+
         public float BaseCost { get; set; }
+
         public float ConsumptionCost { get; set; }
     }
 }
